@@ -1552,3 +1552,24 @@ def edit_post(post_id):
         return redirect(url_for('view_post', slug=post.slug))
 
     return render_template('admin/edit_post.html', post=post)
+
+from flask import Flask, Response
+
+
+@app.route('/sitemap.xml')
+def sitemap():
+    # Mở file sitemap.xml và đọc nội dung
+    with open('sitemap.xml', 'r', encoding='utf-8') as file:
+        sitemap_content = file.read()
+    # Trả về nội dung file với header Content-Type
+    return Response(sitemap_content, mimetype='application/xml')
+
+@app.route('/robots.txt')
+def robots_txt():
+    content = """User-agent: *
+Disallow:
+
+Sitemap: https://tobestore.online/sitemap.xml
+"""
+    return Response(content, mimetype="text/plain")
+
