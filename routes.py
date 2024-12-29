@@ -1556,12 +1556,13 @@ def edit_post(post_id):
 from flask import Flask, Response
 
 
+basedir = os.path.abspath(os.path.dirname(__file__))
+
 @app.route('/sitemap.xml')
 def sitemap():
-    # Mở file sitemap.xml và đọc nội dung
-    with open('sitemap.xml', 'r', encoding='utf-8') as file:
+    filepath = os.path.join(basedir, 'sitemap.xml')
+    with open(filepath, 'r', encoding='utf-8') as file:
         sitemap_content = file.read()
-    # Trả về nội dung file với header Content-Type
     return Response(sitemap_content, mimetype='application/xml')
 
 @app.route('/robots.txt')
