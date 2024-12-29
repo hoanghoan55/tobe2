@@ -1,13 +1,17 @@
-
 <!-- Header -->
 <header class="header">
     <div class="container header-container">
-        <!-- Logo and Slogan -->
+        <!-- Logo -->
         <div class="header-left">
             <a href="{{ url_for('home') }}">
                 <img src="static/img/T.png" alt="TOBE" class="logo">
             </a>
         </div>
+        <!-- Hamburger Menu -->
+        <div class="hamburger-icon">
+            <i class="fas fa-bars"></i>
+        </div>
+        <!-- Menu -->
         <nav class="menu">
             <ul>
                 <li><a href="{{ url_for('home') }}">TRANG CHỦ</a></li>
@@ -25,11 +29,10 @@
                     <i class="fas fa-search"></i>
                 </button>
             </form>
-             <!-- Login and Signup -->
-                <div class="auth-buttons">
-                    <a href="{{ url_for('login') }}" class="login-button">Đăng nhập</a>
-                    <a href="{{ url_for('register') }}" class="signup-button">Đăng ký</a>
-                </div>
+            <div class="auth-buttons">
+                <a href="{{ url_for('login') }}" class="login-button">Đăng nhập</a>
+                <a href="{{ url_for('register') }}" class="signup-button">Đăng ký</a>
+            </div>
             <a href="{{ url_for('cart') }}" class="cart-icon">
                 <i class="fas fa-shopping-cart"></i>
                 <span class="cart-count">{% if 'cart' in session %}{{ session['cart']|length }}{% else %}0{% endif %}</span>
@@ -42,172 +45,126 @@
 /* Header */
 .header {
     background-color: #ffffff;
-    padding: 10px 0;
+    padding: 10px 15px;
     border-bottom: 1px solid #2a2a2a;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    position: relative;
 }
 
 .header-container {
     display: flex;
+    width: 100%;
     justify-content: space-between;
     align-items: center;
 }
 
-.header-left {
-    display: flex;
-    align-items: center;
-}
-
 .header-left .logo {
-    height: 60px;
-    margin-right: 15px;
-}
-
-.header-slogan {
-    font-size: 14px;
-    font-weight: 500;
-    color: #333;
+    height: 50px;
 }
 
 .header-right {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 15px;
 }
 
 .search-form {
-    position: relative;
-    max-width: 400px;
+    display: none; /* Ẩn trên mobile */
 }
 
-.search-form input {
-    width: 100%;
-    padding: 8px 15px;
-    border: 1px solid #2a2a2a;
-    border-radius: 4px;
-    font-size: 14px;
-    background: #fcf4f4;
-}
-
-.search-form button {
-    position: absolute;
-    right: 5px;
-    top: 50%;
-    transform: translateY(-50%);
-    border: none;
-    background: none;
+/* Hamburger Menu */
+.hamburger-icon {
+    display: none;
+    font-size: 24px;
     cursor: pointer;
-    color: #666;
-}
-
-.cart-icon {
-    position: relative;
-    font-size: 20px;
-    color: #333;
-}
-
-.cart-count {
-    position: absolute;
-    top: -5px;
-    right: -10px;
-    background: #ff4444;
-    color: #fff;
-    font-size: 12px;
-    padding: 2px 5px;
-    border-radius: 50%;
 }
 
 /* Menu */
 .menu {
-    background-color: #fafafa;
-    padding: 10px 0;
-    text-align: center;
-}
-
-.menu ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
     display: flex;
-    justify-content: center;
     gap: 20px;
 }
 
-.menu ul li {
-    position: relative;
+.menu ul {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
 .menu ul li a {
     text-decoration: none;
     color: #000000;
     font-size: 14px;
-    font-weight: 600;
     text-transform: uppercase;
-    padding: 5px 15px;
+    padding: 5px 10px;
     transition: all 0.3s ease;
 }
 
 .menu ul li a:hover {
     background-color: #faebeb;
-    color: #111;
     border-radius: 4px;
 }
-    /* Login and Signup Buttons */
-.auth-buttons {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
 
-.login-button, .signup-button {
-    text-decoration: none;
-    padding: 8px 15px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #ffffff;
-    border-radius: 4px;
-    transition: all 0.3s ease;
-}
+/* Responsive Design */
+@media (max-width: 768px) {
+    .header-right {
+        display: none; /* Ẩn các nút đăng nhập/giỏ hàng trên mobile */
+    }
 
-.login-button {
-    background-color: #4CAF50; /* Màu xanh lá cho nút Đăng nhập */
-}
+    .hamburger-icon {
+        display: block;
+    }
 
-.signup-button {
-    background-color: #FF5722; /* Màu cam cho nút Đăng ký */
-}
+    .menu {
+        display: none; /* Ẩn menu trên mobile */
+        position: absolute;
+        top: 60px;
+        left: 0;
+        width: 100%;
+        background-color: #ffffff;
+        flex-direction: column;
+        padding: 15px 0;
+        border-top: 1px solid #eaeaea;
+    }
 
-.login-button:hover {
-    background-color: #45a049; /* Màu đậm hơn khi hover */
-}
+    .menu.show {
+        display: flex;
+    }
 
-.signup-button:hover {
-    background-color: #e64a19; /* Màu đậm hơn khi hover */
-}
+    .menu ul {
+        flex-direction: column;
+        gap: 10px;
+    }
 
+    .menu ul li a {
+        padding: 10px 15px;
+        font-size: 16px;
+    }
+
+    .search-form {
+        display: block; /* Hiển thị form tìm kiếm trên mobile */
+        margin: 10px 0;
+    }
+}
 </style>
-
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const categoryToggle = document.querySelector('.category-toggle');
-    const dropdownMenu = document.querySelector('.dropdown-menu');
     const hamburgerIcon = document.querySelector('.hamburger-icon');
+    const menu = document.querySelector('.menu');
 
-    categoryToggle.addEventListener('click', function(e) {
-        e.preventDefault();
-        this.classList.toggle('active');
-        dropdownMenu.classList.toggle('show');
+    hamburgerIcon.addEventListener('click', function() {
+        menu.classList.toggle('show');
     });
 
-    // Đóng dropdown khi click ra ngoài
+    // Đóng menu khi click ra ngoài
     document.addEventListener('click', function(e) {
-        if (!categoryToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
-            dropdownMenu.classList.remove('show');
-            categoryToggle.classList.remove('active');
+        if (!menu.contains(e.target) && !hamburgerIcon.contains(e.target)) {
+            menu.classList.remove('show');
         }
     });
 });
-</script> 
+</script>
