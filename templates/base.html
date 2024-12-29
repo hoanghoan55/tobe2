@@ -112,37 +112,73 @@
             100% { transform: scale(1); }
         }
 
-        @media (max-width: 768px) {
-            .zalo-button {
-                bottom: 15px;
-                right: 15px;
+        /* Responsive cho mobile */
+        @media (max-width: 992px) { /* Tablet */
+            .container {
+                width: 90%;
             }
-            .zalo-button a { padding: 8px 15px; }
+        }
+
+        @media (max-width: 768px) { /* Điện thoại */
+            .container {
+                width: 95%;
+                padding: 0 10px;
+            }
+
+            .product-image {
+                width: 100%;
+                height: auto;
+            }
+
+            h1, h2, h3, h4, h5, h6 {
+                font-size: 1.2em;
+            }
+            
+            p {
+                font-size: 13px;
+            }
+
+            a {
+                font-size: 12px;
+            }
+
+            .zalo-button {
+                bottom: 10px;
+                right: 10px;
+            }
+
+            .zalo-button a {
+                padding: 8px 10px;
+                font-size: 12px;
+            }
+
             .zalo-button img {
                 width: 25px;
                 height: 25px;
             }
-            .zalo-button span { font-size: 12px; }
-        }
 
-        /* Responsive cỡ chữ và hình ảnh */
-        @media (max-width: 768px) {
-            body {
-                font-size: 14px;
-            }
-            img {
-                width: 100%;
-                height: auto;
+            .zalo-button span {
+                font-size: 12px;
             }
         }
 
-        @media (max-width: 480px) {
+        @media (max-width: 480px) { /* Điện thoại nhỏ */
             body {
                 font-size: 12px;
             }
+
+            h1, h2, h3 {
+                font-size: 1.1em;
+            }
+
             img {
                 width: 100%;
                 height: auto;
+            }
+
+            .zalo-button a {
+                padding: 5px 10px;
+                font-size: 11px;
             }
         }
     </style>
