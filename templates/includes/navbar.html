@@ -25,6 +25,11 @@
                     <i class="fas fa-search"></i>
                 </button>
             </form>
+             <!-- Login and Signup -->
+                <div class="auth-buttons">
+                    <a href="{{ url_for('login') }}" class="login-button">Đăng nhập</a>
+                    <a href="{{ url_for('signup') }}" class="signup-button">Đăng ký</a>
+                </div>
             <a href="{{ url_for('cart') }}" class="cart-icon">
                 <i class="fas fa-shopping-cart"></i>
                 <span class="cart-count">{% if 'cart' in session %}{{ session['cart']|length }}{% else %}0{% endif %}</span>
