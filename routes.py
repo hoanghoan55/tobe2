@@ -1556,3 +1556,19 @@ def edit_post(post_id):
         return redirect(url_for('view_post', slug=post.slug))
 
     return render_template('admin/edit_post.html', post=post)
+
+@app.route('/sitemap.xml')
+def sitemap():
+    filepath = os.path.join(basedir, 'sitemap.xml')
+    with open(filepath, 'r', encoding='utf-8') as file:
+        sitemap_content = file.read()
+    return Response(sitemap_content, mimetype='application/xml')
+
+@app.route('/robots.txt')
+def robots_txt():
+    content = """User-agent: *
+Disallow:
+
+Sitemap: https://tobestore.online/sitemap.xml
+"""
+    return Response(content, mimetype="text/plain")
