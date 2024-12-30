@@ -1557,18 +1557,22 @@ def edit_post(post_id):
 
     return render_template('admin/edit_post.html', post=post)
 
+
+
+basedir = os.path.abspath(os.path.dirname(__file__))
+
 @app.route('/sitemap.xml')
 def sitemap():
     filepath = os.path.join(basedir, 'sitemap.xml')
-    with open(filepath, 'r', encoding='utf-8') as file:
-        sitemap_content = file.read()
-    return Response(sitemap_content, mimetype='application/xml')
+    # Đảm bảo tệp sitemap.xml tồn tại và trả về đúng nội dung
+    with open(filepath, 'r') as file:
+        return Response(file.read(), mimetype="application/xml")
+
+
+from flask import Response
 
 @app.route('/robots.txt')
 def robots_txt():
-    content = """User-agent: *
-Disallow:
-
-Sitemap: https://tobestore.online/sitemap.xml
-"""
+    content = "User-agent: *\nDisallow:"
     return Response(content, mimetype="text/plain")
+
