@@ -7,7 +7,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Giỏ Hàng</title>
- 
+    <!-- Thêm các style cho modal và giỏ hàng -->
     <style>
         /* CSS cho trang giỏ hàng */
         .container {
@@ -36,8 +36,6 @@
             height: auto;
             margin-right: 40px;
             border-radius: 4px;
-           
-            
         }
 
         .cart-item-details {
@@ -91,40 +89,102 @@
         .btn-secondary:hover {
             background-color: #5a6268;
         }
+
+        .alert {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>Giỏ Hàng</h2>
         
-        {% if cart_items %}
-            {% for item in cart_items %}
-            <div class="cart-item">
-                <img src="{{ url_for('static', filename='uploads/images/variants/' + item.image) }}" alt="{{ item.variant_name }}">
-                <div class="cart-item-details">
-                    <div class="cart-item-title">{{ item.name }}</div>
-                    
-                    <div class="cart-item-variant" style="color: #007bff;">Kiểu Mẫu : {{ item.variant_name }}</div> <!-- Hiển thị tên biến thể -->
-                    <div class="cart-item-price">{{ item.price | number_format(0, ',', '.') }} ₫</div>
-                    <div class="cart-item-quantity">Số lượng: {{ item.quantity }}</div>
-                    <form action="{{ url_for('remove_from_cart', product_id=item.product_id, variant_id=item.variant_id) }}" method="post" style="display: inline;">
-                        <button type="submit" class="btn btn-secondary">Xóa</button>
+        {% if not logged_in %}
+            <div class="alert">
+                Vui lòng <a href="#" data-bs-toggle="modal" data-bs-target="#loginModal" class="alert-link">đăng nhập</a> để truy cập giỏ hàng.
+            </div>
+        {% else %}
+            {% if cart_items %}
+                {% for item in cart_items %}
+                <div class="cart-item">
+                    <img src="{{ url_for('static', filename='uploads/images/variants/' + item.image) }}" alt="{{ item.variant_name }}">
+                    <div class="cart-item-details">
+                        <div class="cart-item-title">{{ item.name }}</div>
+                        <div class="cart-item-variant" style="color: #007bff;">Kiểu Mẫu : {{ item.variant_name }}</div>
+                        <div class="cart-item-price">{{ item.price | number_format(0, ',', '.') }} ₫</div>
+                        <div class="cart-item-quantity">Số lượng: {{ item.quantity }}</div>
+                        <form action="{{ url_for('remove_from_cart', product_id=item.product_id, variant_id=item.variant_id) }}" method="post" style="display: inline;">
+                            <button type="submit" class="btn btn-secondary">Xóa</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+                
+                <div class="total-price">
+                    Tổng cộng: {{ total_price | number_format(0, ',', '.') }} ₫
+                </div>
+                <a href="{{ url_for('checkout') }}" class="btn btn-primary">Thanh toán</a>
+                <a href="{{ url_for('products') }}" class="btn btn-secondary">Tiếp tục mua sắm</a>
+            {% else %}
+                <div class="alert alert-info">
+                    Giỏ hàng của bạn đang trống. 
+                    <a href="{{ url_for('products') }}" class="alert-link">Tiếp tục mua sắm</a>
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    <!-- Modal Đăng Nhập -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loginModalLabel">Đăng Nhập</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{{ url_for('login') }}">
+                        <input type="text" name="username" placeholder="Email hoặc Tài khoản" required>
+                        <input type="password" name="password" placeholder="Mật Khẩu" required>
+                        <div class="remember-me">
+                            <label for="remember">Nhớ mật khẩu</label>
+                            <input type="checkbox" id="remember" name="remember">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Đăng Nhập</button>
                     </form>
+                    <p class="text-center mt-3">
+                        Bạn chưa có tài khoản? <a href="#" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#registerModal">Đăng Ký</a>
+                    </p>
                 </div>
             </div>
-            {% endfor %}
-            
-            <div class="total-price">
-                Tổng cộng: {{ total_price | number_format(0, ',', '.') }} ₫
+        </div>
+    </div>
+    <!-- Modal Đăng Ký -->
+    <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="registerModalLabel">Đăng Ký</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{{ url_for('register') }}">
+                        <input type="text" name="username" placeholder="Tên Tài khoản" required>
+                        <input type="email" name="email" placeholder="Email" required>
+                        <input type="password" name="password" placeholder="Mật Khẩu" required>
+                        <input type="password" name="confirm_password" placeholder="Xác nhận Mật Khẩu" required>
+                        <button type="submit" class="btn btn-success w-100">Đăng Ký</button>
+                    </form>
+                    <p class="text-center mt-3">
+                        Đã có tài khoản? <a href="#" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#loginModal">Đăng Nhập</a>
+                    </p>
+                </div>
             </div>
-            <a href="{{ url_for('checkout') }}" class="btn btn-primary">Thanh toán</a>
-            <a href="{{ url_for('products') }}" class="btn btn-secondary">Tiếp tục mua sắm</a>
-        {% else %}
-            <div class="alert alert-info">
-                Giỏ hàng của bạn đang trống. 
-                <a href="{{ url_for('products') }}" class="alert-link">Tiếp tục mua sắm</a>
-            </div>
-        {% endif %}
+        </div>
     </div>
 </body>
 </html>
