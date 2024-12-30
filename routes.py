@@ -282,7 +282,7 @@ def add_to_cart(product_id):
         print(f"Error in add_to_cart: {str(e)}")  # Log lỗi để debug
         return jsonify({
             'success': False,
-            'message': 'Có lỗi xảy ra khi thêm vào giỏ hàng'
+            'message': 'Vui lòng đăng nhập để đặt hàng'
         })
 
 
@@ -298,23 +298,27 @@ def remove_from_cart(product_id, variant_id):
 
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login', methods=['POST'])
 def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        remember = 'remember' in request.form  # Kiểm tra nếu người dùng chọn "Nhớ mật khẩu"
+
         user = User.query.filter_by(username=username).first()
         if user and check_password_hash(user.password, password):
-            login_user(user)
-            return redirect(url_for('home'))
+            login_user(user, remember=remember)
+            flash('Đăng nhập thành công!', 'success')
+            return jsonify({'success': True, 'redirect_url': url_for('home')})
         else:
-            flash('Login Unsuccessful. Please check username and password', 'danger')
-            return redirect(url_for('register'))
-    return render_template('login.html')
+            return jsonify({'success': False, 'message': 'Sai tài khoản hoặc mật khẩu!'})
+    return jsonify({'success': False, 'message': 'Yêu cầu không hợp lệ!'})
 
 @app.route('/logout')
 def logout():
     logout_user()
+    session.pop('user', None)
+    flash('Bạn đã đăng xuất thành công!', 'success')
     return redirect(url_for('home'))
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -1552,25 +1556,3 @@ def edit_post(post_id):
         return redirect(url_for('view_post', slug=post.slug))
 
     return render_template('admin/edit_post.html', post=post)
-
-from flask import Flask, Response
-
-
-basedir = os.path.abspath(os.path.dirname(__file__))
-
-@app.route('/sitemap.xml')
-def sitemap():
-    filepath = os.path.join(basedir, 'sitemap.xml')
-    with open(filepath, 'r', encoding='utf-8') as file:
-        sitemap_content = file.read()
-    return Response(sitemap_content, mimetype='application/xml')
-
-@app.route('/robots.txt')
-def robots_txt():
-    content = """User-agent: *
-Disallow:
-
-Sitemap: https://tobestore.online/sitemap.xml
-"""
-    return Response(content, mimetype="text/plain")
-
