@@ -41,17 +41,17 @@ def setup_default_images():
     static_dir = Path(app.root_path) / 'static'
     img_dir = static_dir / 'img'
     img_dir.mkdir(exist_ok=True)
-    
+
     # Đường dẫn đến ảnh mặc định
     default_variant = img_dir / 'default-variant.jpg'
     default_product = img_dir / 'default-product.jpg'
-    
+
     # Copy ảnh mặc định từ thư mục assets nếu chưa tồn tại
     if not default_variant.exists():
         source = Path(app.root_path) / 'static' / 'assets' / 'default-variant.jpg'
         if source.exists():
             shutil.copy(source, default_variant)
-    
+
     if not default_product.exists():
         source = Path(app.root_path) / 'static' / 'assets' / 'default-product.jpg'
         if source.exists():
@@ -66,7 +66,7 @@ def home():
     # Lấy sản phẩm theo danh mục
     featured_products = {}
     categories = Category.query.all()
-    
+
     for category in categories:
         products = Product.query.filter_by(category_id=category.id).limit(8).all()
         if products:
@@ -75,8 +75,8 @@ def home():
     posts = Post.query\
         .order_by(Post.date_posted.desc())\
         .limit(per_page).all()  # Lấy 3 bài viết mới nhất
-            
-    return render_template('home.html', 
+
+    return render_template('home.html',
                          featured_products=featured_products,
                          categories=categories,
                          posts=posts)
@@ -85,37 +85,37 @@ def home():
 def product(product_id):
 
         print(f"Accessing product route with ID: {product_id}")
-        
+
         # Lấy thông tin sản phẩm
         product = Product.query.get_or_404(product_id)
         if not product:
             print("Product not found")
             flash('Không tìm thấy sản phẩm', 'error')
             return redirect(url_for('home'))
-            
+
         print(f"Found product: {product.name}")
-        
+
         # Kiểm tra và chuẩn bị ảnh sản phẩm
         if not product.image_files:
             product.image_files = ['default-product.jpg']
             print("Using default product image")
-        
+
         # Lấy các biến thể của sản phẩm
         variants = Variant.query.filter_by(product_id=product.id).all()
         print(f"Found {len(variants)} variants")
-        
+
         # Chuẩn bị dữ liệu biến thể
         for variant in variants:
             if not variant.image_file:
                 variant.image_file = 'default-variant.jpg'
             print(f"Variant {variant.name} with image: {variant.image_file}")
-        
+
         # Lấy sản phẩm liên quan
         related_products = Product.query.filter(
             Product.category_id == product.category_id,
             Product.id != product.id
         ).limit(4).all()
-        
+
         print("Preparing to render product.html template")
         data = {
         'shop_url': url_for('products'),  # URL cho nút "Tiếp tục mua sắm"
@@ -131,7 +131,7 @@ def product(product_id):
         except Exception as template_error:
             print(f"Template error: {str(template_error)}")
             raise
-                             
+
 
 
 @app.route('/products')
@@ -139,16 +139,16 @@ def products():
     page = request.args.get('page', 1, type=int)
     category_name = request.args.get('category')
     sort = request.args.get('sort', 'newest')
-    
+
     # Query cơ bản
     query = Product.query
-    
+
     # Filter theo category nếu có
     if category_name:
         category = Category.query.filter_by(name=category_name).first()
         if category:
             query = query.filter_by(category_id=category.id)
-    
+
     # Sắp xếp
     if sort == 'price-asc':
         query = query.order_by(Product.price.asc())
@@ -156,7 +156,7 @@ def products():
         query = query.order_by(Product.price.desc())
     else:  # newest
         query = query.order_by(Product.id.desc())
-    
+
     # Phân trang
     products = query.paginate(page=page, per_page=12, error_out=False)
     categories = Category.query.all()
@@ -165,8 +165,8 @@ def products():
     for product in products.items:
         if not product.image_files:
             product.image_files = ['default-product.jpg']
-            
-    return render_template('products.html', 
+
+    return render_template('products.html',
                          products=products,
                          categories=categories,
                          selected_category=category_name)
@@ -176,36 +176,36 @@ def products():
 def cart():
     if 'cart' not in session:
         session['cart'] = []
-    
+
     cart_items = []
     total_price = 0
-    
+
     try:
         for item in session['cart']:
-            product = Product.query.get(item['product_id'])
-            variant = Variant.query.get(item['variant_id'])
-            if product and variant:
-                # Đảm bảo các giá trị số được chuyển đổi đúng kiểu
-                quantity = int(item['quantity'])
-                price = float(variant.value)
-                item_total = price * quantity
-                
-                cart_item = {
-                    'id': item['product_id'],
-                    'name': product.name,
-                    'variant_name': variant.name,
-                    'price': price,
-                    'quantity': quantity,
-                    'total': item_total,
-                    'image': variant.image_file if variant.image_file else 'default-variant.jpg',  # Lấy hình ảnh của biến thể
-                    'product_id': product.id,
-                    'variant_id': variant.id
-                }
-                cart_items.append(cart_item)
-                total_price += item_total
+            product = Product.query.get_or_404(item['product_id'])  # Trả về lỗi 404 nếu không tìm thấy sản phẩm
+            variant = Variant.query.get_or_404(item['variant_id'])  # Trả về lỗi 404 nếu không tìm thấy biến thể
 
-        return render_template('cart.html', cart_items=cart_items, total_price=total_price)
-        
+            # Đảm bảo các giá trị số được chuyển đổi đúng kiểu
+            quantity = int(item['quantity'])  # Chuyển số lượng thành integer
+            price = float(variant.value)  # Giá của biến thể
+            item_total = price * quantity  # Tổng giá trị của sản phẩm trong giỏ hàng
+
+            cart_item = {
+                'id': item['product_id'],
+                'name': product.name,
+                'variant_name': variant.name,
+                'price': price,
+                'quantity': quantity,
+                'total': item_total,
+                'image': variant.image_file if variant.image_file else 'default-variant.jpg',  # Lấy hình ảnh của biến thể
+                'product_id': product.id,
+                'variant_id': variant.id
+            }
+            cart_items.append(cart_item)  # Thêm sản phẩm vào danh sách giỏ hàng
+            total_price += item_total  # Cập nhật tổng giá trị của giỏ hàng
+
+        return render_template('cart.html', cart_items=cart_items, total_price=total_price, logged_in=current_user.is_authenticated)
+
     except Exception as e:
         print(f"Error in cart route: {str(e)}")  # Debug log
         flash('Có lỗi xảy ra khi hiển thị giỏ hàng!', 'danger')
@@ -217,16 +217,16 @@ def cart():
 def add_to_cart(product_id):
     try:
         # Lấy ID biến thể và số lượng từ form
-        variant_id = request.form.get('variant')  
+        variant_id = request.form.get('variant')
         quantity = int(request.form.get('quantity', 1))
-        
+
         if not variant_id:
             print("Không có biến thể được chọn")
             return jsonify({
                 'success': False,
                 'message': 'Vui lòng chọn Mẫu!'
             })
-        
+
         # Kiểm tra số lượng
         if quantity <= 0:
             return jsonify({
@@ -237,21 +237,21 @@ def add_to_cart(product_id):
         # Khởi tạo giỏ hàng nếu chưa có
         if 'cart' not in session:
             session['cart'] = []
-        
+
         # Lấy thông tin sản phẩm và biến thể
         product = Product.query.get_or_404(product_id)
         variant = Variant.query.get_or_404(variant_id)
-        
+
         # Kiểm tra xem sản phẩm đã có trong giỏ hàng chưa
         cart = session['cart']
         item_found = False
-        
+
         for item in cart:
             if item.get('product_id') == product_id and item.get('variant_id') == int(variant_id):
                 item['quantity'] += quantity  # Cập nhật số lượng
                 item_found = True
                 break
-        
+
         if not item_found:
             cart.append({
                 'product_id': product_id,
@@ -261,10 +261,10 @@ def add_to_cart(product_id):
                 'variant_name': variant.name,
                 'price': variant.value
             })
-        
+
         session['cart'] = cart
         session.modified = True
-            
+
         return jsonify({
             'success': True,
             'message': 'Đã thêm vào giỏ hàng thành công!',
@@ -272,7 +272,7 @@ def add_to_cart(product_id):
             'shop_url': url_for('products'),  # URL đến trang cửa hàng
             'cart_url': url_for('cart')   # URL đến giỏ hàng
         })
-        
+
     except ValueError:
         return jsonify({
             'success': False,
@@ -290,7 +290,7 @@ def add_to_cart(product_id):
 @login_required
 def remove_from_cart(product_id, variant_id):
     if 'cart' in session:
-        session['cart'] = [item for item in session['cart'] 
+        session['cart'] = [item for item in session['cart']
                           if not (item['product_id'] == product_id and item['variant_id'] == variant_id)]
         session.modified = True
         flash('Sản phẩm đã được xóa khỏi giỏ hàng!', 'success')
@@ -305,13 +305,20 @@ def login():
         password = request.form['password']
         remember = 'remember' in request.form  # Kiểm tra nếu người dùng chọn "Nhớ mật khẩu"
 
+        # Tìm người dùng theo tên đăng nhập
         user = User.query.filter_by(username=username).first()
-        if user and check_password_hash(user.password, password):
-            login_user(user, remember=remember)
+
+        # Kiểm tra nếu người dùng tồn tại và mật khẩu hợp lệ
+        if user and password:
+            login_user(user, remember=remember)  # Đăng nhập và lưu phiên người dùng
             flash('Đăng nhập thành công!', 'success')
+            # Trả về phản hồi JSON với thông báo thành công và URL chuyển hướng
             return jsonify({'success': True, 'redirect_url': url_for('home')})
         else:
+            # Trường hợp người dùng không tồn tại hoặc mật khẩu không đúng
             return jsonify({'success': False, 'message': 'Sai tài khoản hoặc mật khẩu!'})
+
+    # Nếu phương thức không phải POST, trả về thông báo lỗi
     return jsonify({'success': False, 'message': 'Yêu cầu không hợp lệ!'})
 
 @app.route('/logout')
@@ -1585,3 +1592,4 @@ from flask import Response
 def robots_txt():
     content = "User-agent: *\nDisallow:"
     return Response(content, mimetype="text/plain")
+
