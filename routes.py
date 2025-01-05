@@ -351,7 +351,7 @@ def register():
 def manage_products():
     products = Product.query.all()
     categories = Category.query.all()
-    return render_template('admin/manage_products.html', 
+    return render_template('admin/manage_products.html',
                          products=products,
                          categories=categories,
                          active_page='products')
@@ -367,7 +367,7 @@ def add_product():
             category_id = request.form.get('category')
             price = request.form.get('price')
             description = request.form.get('description')
-            
+
             # Xử lý danh mục mới nếu có
             new_category_name = request.form.get('new_category')
             if new_category_name:
@@ -413,7 +413,7 @@ def add_product():
                             value=float(value),
                             product_id=new_product.id
                         )
-                        
+
                         # Xử lý ảnh biến thể
                         if image and image.filename:  # Kiểm tra có file được upload không
                             print(f"Xử lý ảnh biến thể: {image.filename}")
@@ -422,7 +422,7 @@ def add_product():
                                 if filename:
                                     variant.image_file = filename  # Chỉ lưu tên file
                                     print(f"Đã lưu ảnh biến thể: {filename}")
-                        
+
                         db.session.add(variant)
                         print(f"Đã thêm biến thể: {name} với ảnh: {variant.image_file}")
                     except Exception as e:
@@ -448,12 +448,12 @@ def add_product():
 @admin_required
 def edit_product(id):
     product = Product.query.get_or_404(id)
-    
+
     # Kiểm tra và sửa đường dẫn ảnh cho các biến thể
     for variant in product.variants:
         if variant.image_file:
             variant.image_file = verify_image_path(variant.image_file, 'variants')
-    
+
     if request.method == 'POST':
         try:
             # Cập nhật thông tin cơ bản
@@ -495,7 +495,7 @@ def edit_product(id):
                         variant = existing_variants[vid]
                         variant.name = name
                         variant.value = float(value)
-                        
+
                         # Cập nhật ảnh nếu có
                         if image and image.filename:
                             filename = save_image(image, 'variants')
@@ -531,7 +531,7 @@ def edit_product(id):
     categories = Category.query.all()
     # Đảm bảo đường dẫn ảnh đúng với cấu trúc thư mục
     image_path = 'uploads/images/products/'  # Thay đổi đường dẫn này
-    return render_template('admin/edit_product.html', 
+    return render_template('admin/edit_product.html',
                          product=product,
                          categories=categories,
                          image_path=image_path)
@@ -543,10 +543,10 @@ def delete_product(id):
     try:
         # Tìm sản phẩm
         product = Product.query.get_or_404(id)
-        
+
         # Xóa các biến thể trước
         Variant.query.filter_by(product_id=id).delete()
-        
+
         # Xóa các file ảnh
         if product.image_files:
             for image in product.image_files:
@@ -556,11 +556,11 @@ def delete_product(id):
                         os.remove(image_path)
                 except Exception as e:
                     print(f"Error deleting image {image}: {str(e)}")
-        
+
         # Xóa sản phẩm
         db.session.delete(product)
         db.session.commit()
-        
+
         flash('Sản phẩm đã được xóa thành công!', 'success')
         return jsonify({
             'success': True,
@@ -594,7 +594,7 @@ def new_post():
             title = request.form['title']
             # Lấy nội dung HTML từ CKEditor
             content = request.form['content']
-            
+
             # Xử lý file ảnh
             image_filename = None
             if 'image_file' in request.files:
@@ -624,17 +624,17 @@ def new_post():
                 image_file=image_filename,
                 video_file=video_filename
             )
-            
+
             db.session.add(post)
             db.session.commit()
             flash('Bài viết đã được tạo thành công!', 'success')
             return redirect(url_for('blog'))
-            
+
         except Exception as e:
             db.session.rollback()
             flash(f'Có lỗi xảy ra: {str(e)}', 'danger')
             return redirect(url_for('new_post'))
-            
+
     return render_template('admin/add_post.html')
 
 
@@ -645,7 +645,7 @@ def update_post(post_id):
     post = Post.query.get_or_404(post_id)
     if post.author != current_user:
         abort(403)
-        
+
     if request.method == 'POST':
         try:
             post.title = request.form['title']
@@ -660,7 +660,7 @@ def update_post(post_id):
                         old_image_path = os.path.join(app.root_path, 'static/img', post.image_file)
                         if os.path.exists(old_image_path):
                             os.remove(old_image_path)
-                            
+
                     # Lưu ảnh mới
                     image_filename = secure_filename(image_file.filename)
                     image_path = os.path.join(app.root_path, 'static/img')
@@ -677,7 +677,7 @@ def update_post(post_id):
                         old_video_path = os.path.join(app.root_path, 'static/video', post.video_file)
                         if os.path.exists(old_video_path):
                             os.remove(old_video_path)
-                            
+
                     # Lưu video mới
                     video_filename = secure_filename(video_file.filename)
                     video_path = os.path.join(app.root_path, 'static/video')
@@ -688,11 +688,11 @@ def update_post(post_id):
             db.session.commit()
             flash('Bài viết đã được cập nhật thành công!', 'success')
             return redirect(url_for('post', post_id=post.id))
-            
+
         except Exception as e:
             db.session.rollback()
             flash(f'Có lỗi xảy ra: {str(e)}', 'danger')
-            
+
     return render_template('admin/add_post.html', title='Cập nhật bài viết', post=post)
 
 @app.route('/admin/post/<int:post_id>/delete', methods=['GET', 'POST'])
@@ -702,11 +702,11 @@ def delete_post(post_id):
     try:
         # Debug log
         print(f"\n=== Bắt đầu xóa bài viết ID: {post_id} ===")
-        
+
         # Tìm bài viết
         post = Post.query.get_or_404(post_id)
         print(f"Đã tìm thấy bài viết: {post.title}")
-        
+
         # Xóa file ảnh nếu có
         if post.image_file:
             try:
@@ -718,24 +718,24 @@ def delete_post(post_id):
             except Exception as e:
                 print(f"Lỗi khi xóa file ảnh: {str(e)}")
                 # Tiếp tục xóa bài viết ngay cả khi không xóa được ảnh
-        
+
         # Lưu thông tin bài viết trước khi xóa
         title = post.title
-        
+
         # Xóa bài viết
         db.session.delete(post)
         db.session.commit()
-        
+
         print(f"Đã xóa bài viết thành công: {title}")
         flash(f'Bài viết "{title}" đã được xóa thành công!', 'success')
-        
+
     except Exception as e:
         db.session.rollback()
         print(f"Lỗi SQLAlchemy: {str(e)}")
         flash('Có lỗi xảy ra khi xóa bài viết trong database!', 'danger')
-        
 
-    
+
+
     finally:
         # Luôn redirect về trang quản lý
         return redirect(url_for('manage_posts'))
@@ -762,7 +762,7 @@ def contact():
             print(f"Lỗi: {e}")
 
         return redirect('/contact')
-    
+
     return render_template('contact.html')
 
 def send_email(name, email, message):
@@ -780,7 +780,7 @@ def send_email(name, email, message):
 @admin_required
 def manage_categories():
     categories = Category.query.all()
-    return render_template('admin/manage_categories.html', 
+    return render_template('admin/manage_categories.html',
                          categories=categories,
                          active_page='categories')
 
@@ -790,18 +790,18 @@ def manage_categories():
 def add_category():
     if request.method == 'POST':
         name = request.form.get('name')
-        
+
         # Kiểm tra tên danh mục không được trống
         if not name:
             flash('Tên danh mục không được để trống', 'danger')
             return redirect(url_for('add_category'))
-            
+
         # Kiểm tra danh mục đã tồn tại chưa
         existing_category = Category.query.filter_by(name=name).first()
         if existing_category:
             flash('Danh mục này đã tồn tại', 'danger')
             return redirect(url_for('add_category'))
-        
+
         try:
             new_category = Category(name=name)
             db.session.add(new_category)
@@ -820,24 +820,24 @@ def add_category():
 @admin_required
 def edit_category(id):
     category = Category.query.get_or_404(id)
-    
+
     if request.method == 'POST':
         name = request.form.get('name')
-        
+
         if not name:
             flash('Tên danh mục không được để trống', 'danger')
             return redirect(url_for('edit_category', id=id))
-        
+
         # Kiểm tra tên mới có trùng với danh mục khác không
         existing_category = Category.query.filter(
-            Category.name == name, 
+            Category.name == name,
             Category.id != id
         ).first()
-        
+
         if existing_category:
             flash('Danh mục này đã tồn tại', 'danger')
             return redirect(url_for('edit_category', id=id))
-            
+
         try:
             category.name = name
             db.session.commit()
@@ -846,7 +846,7 @@ def edit_category(id):
         except Exception as e:
             db.session.rollback()
             flash(f'Có lỗi xảy ra: {str(e)}', 'danger')
-            
+
     return render_template('admin/edit_category.html', category=category)
 
 @app.route('/admin/categories/delete/<int:id>', methods=['POST'])
@@ -854,12 +854,12 @@ def edit_category(id):
 @admin_required
 def delete_category(id):
     category = Category.query.get_or_404(id)
-    
+
     # Kiểm tra xem danh mục có sản phẩm không
     if category.products:
         flash('Không thể xóa danh mục đang có sản phẩm', 'danger')
         return redirect(url_for('manage_categories'))
-        
+
     try:
         db.session.delete(category)
         db.session.commit()
@@ -867,24 +867,24 @@ def delete_category(id):
     except Exception as e:
         db.session.rollback()
         flash(f'Có lỗi xảy ra: {str(e)}', 'danger')
-        
+
     return redirect(url_for('manage_categories'))
 
 @app.route('/category/<int:category_id>')
 def category(category_id):
     category = Category.query.get_or_404(category_id)
     products = Product.query.filter_by(category_id=category_id).all()
-    return render_template('category.html', 
-                         category=category, 
+    return render_template('category.html',
+                         category=category,
                          products=products)
 
 @app.route('/search')
 def search():
     query = request.args.get('q', '')
-    
+
     if not query:
         return render_template('search.html', products=[], query='')
-    
+
     # Chỉ tìm theo tên và mô tả
     products = Product.query.filter(
         or_(
@@ -892,15 +892,15 @@ def search():
             Product.description.ilike(f'%{query}%')
         )
     ).all()
-    
+
     products_by_category = {}
     for product in products:
         category = product.category
         if category not in products_by_category:
             products_by_category[category] = []
         products_by_category[category].append(product)
-    
-    return render_template('search.html', 
+
+    return render_template('search.html',
                          products_by_category=products_by_category,
                          query=query,
                          total_results=len(products))
@@ -914,7 +914,7 @@ import re
 def view_post(slug):
     # Tìm bài viết theo slug
     post = Post.query.filter_by(slug=slug).first_or_404()
-    
+
     # Lấy tất cả các thẻ <h2> trong nội dung bài viết
     headings = re.findall(r'<h2.*?>(.*?)</h2>', post.content)
     headings = [{'id': f'heading-{i+1}', 'text': text} for i, text in enumerate(headings)]
@@ -930,12 +930,12 @@ def view_post(slug):
         Post.status == 'published'
     ).order_by(Post.id.asc()).first()
 
-    return render_template('post.html', 
-                           post=post, 
-                           headings=headings, 
-                           prev_post=prev_post, 
+    return render_template('post.html',
+                           post=post,
+                           headings=headings,
+                           prev_post=prev_post,
                            next_post=next_post)
-         
+
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -945,85 +945,86 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+
+
 @app.route('/admin/dashboard')
 @login_required
-@admin_required
 def admin_dashboard():
-    try:
-        # Thống kê cơ bản
-        order_count = Order.query.count()
-        new_order_count = Order.query.filter_by(status='pending').count()
-        product_count = Product.query.count()
-        user_count = User.query.count()
-        
-        # Tính tổng doanh thu
-        total_revenue = db.session.query(func.sum(Order.total_price))\
-            .filter(Order.status == 'completed')\
-            .scalar() or 0
-        
-        # Đơn hàng gần đây
-        recent_orders = Order.query.order_by(Order.created_at.desc()).limit(5).all()
-        
-        # Thống kê doanh thu theo tháng
-        current_year = datetime.utcnow().year
-        monthly_revenue = db.session.query(
-            func.strftime('%m', Order.created_at).label('month'),
-            func.sum(Order.total_price).label('revenue')
-        ).filter(
-            Order.status == 'completed',
-            func.strftime('%Y', Order.created_at) == str(current_year)
-        ).group_by('month').all()
-        
-        # Đảm bảo dữ liệu không None trước khi chuyển thành JSON
-        revenue_labels = [f'Tháng {m[0]}' for m in monthly_revenue] if monthly_revenue else []
-        revenue_data = [float(m[1] or 0) for m in monthly_revenue] if monthly_revenue else []
-        
-        # Top sản phẩm bán chạy
-        top_products = db.session.query(
-            Product.name,
-            func.sum(OrderItem.quantity).label('total_sold')
-        ).join(OrderItem).join(Order).filter(
-            Order.status == 'completed'
-        ).group_by(Product.id).order_by(
-            func.sum(OrderItem.quantity).desc()
-        ).limit(5).all()
-        
-        # Đảm bảo dữ liệu không None
-        product_labels = [p[0] for p in top_products] if top_products else []
-        product_data = [int(p[1] or 0) for p in top_products] if top_products else []
-        
-        # Debug: In ra dữ liệu trước khi chuyển thành JSON
-        print("Revenue Labels:", revenue_labels)
-        print("Revenue Data:", revenue_data)
-        print("Product Labels:", product_labels)
-        print("Product Data:", product_data)
-        
-        return render_template('admin/dashboard.html',
-                             active_page='dashboard',
-                             order_count=order_count,
-                             new_order_count=new_order_count,
-                             product_count=product_count,
-                             user_count=user_count,
-                             total_revenue=total_revenue,
-                             recent_orders=recent_orders,
-                             revenue_labels=json.dumps(revenue_labels, ensure_ascii=False),
-                             revenue_data=json.dumps(revenue_data),
-                             product_labels=json.dumps(product_labels, ensure_ascii=False),
-                             product_data=json.dumps(product_data))
-                             
-    except Exception as e:
-        print(f"Error in dashboard: {str(e)}")
-        import traceback
-        traceback.print_exc()
-        flash('Có lỗi xảy ra khi tải trang dashboard', 'error')
-        return redirect(url_for('home'))
+    # Thống kê cơ bản
+    order_count = Order.query.count()
+    new_order_count = Order.query.filter_by(status='pending').count()
+    product_count = Product.query.count()
+    user_count = User.query.count()
+
+    # Tính tổng doanh thu
+    total_revenue = db.session.query(func.sum(Order.total_price)) \
+        .filter(Order.status == 'completed') \
+        .scalar() or 0
+
+    # Đơn hàng gần đây
+    recent_orders = Order.query.order_by(Order.created_at.desc()).limit(5).all()
+
+    # Thống kê doanh thu theo tháng
+    current_year = datetime.utcnow().year
+    monthly_revenue = db.session.query(
+        func.date_format(Order.created_at, '%m').label('month'),  # Sử dụng DATE_FORMAT
+        func.sum(Order.total_price).label('revenue')
+    ).filter(
+        Order.status == 'completed',
+        func.date_format(Order.created_at, '%Y') == str(current_year)  # So sánh theo năm
+    ).group_by('month').all()
+
+    # Xử lý dữ liệu doanh thu
+    revenue_labels = [f'Tháng {int(m[0])}' for m in monthly_revenue] if monthly_revenue else []
+    revenue_data = [float(m[1] or 0) for m in monthly_revenue] if monthly_revenue else []
+
+    # Thống kê sản phẩm bán chạy
+    top_products = db.session.query(
+        Product.name,
+        func.sum(OrderItem.quantity).label('total_sold')
+    ).join(OrderItem).join(Order).filter(
+        Order.status == 'completed'
+    ).group_by(Product.id).order_by(
+        func.sum(OrderItem.quantity).desc()
+    ).limit(5).all()
+
+    # Xử lý dữ liệu sản phẩm
+    product_labels = [p[0] for p in top_products] if top_products else []
+    product_data = [int(p[1] or 0) for p in top_products] if top_products else []
+
+    # Thống kê thêm
+    low_stock_count = Product.query.filter(Product.stock < 10).count()
+    new_user_count = User.query.filter(
+        User.date_joined >= datetime.utcnow().replace(day=1)  # Sử dụng 'date_joined' thay vì 'created_at'
+    ).count()
+
+    # Trả về giao diện
+    return render_template(
+        'admin/dashboard.html',
+        active_page='dashboard',
+        order_count=order_count,
+        new_order_count=new_order_count,
+        product_count=product_count,
+        user_count=user_count,
+        total_revenue=total_revenue,
+        recent_orders=recent_orders,
+        revenue_labels=json.dumps(revenue_labels, ensure_ascii=False),
+        revenue_data=json.dumps(revenue_data),
+        product_labels=json.dumps(product_labels, ensure_ascii=False),
+        product_data=json.dumps(product_data),
+        low_stock_count=low_stock_count,
+        new_user_count=new_user_count,
+    )
+
+
+
 
 @app.route('/admin/order/<int:order_id>/details')
 @login_required
 @admin_required
 def get_order_details(order_id):
     order = Order.query.get_or_404(order_id)
-    
+
     items = []
     for item in order.order_items:
         items.append({
@@ -1033,7 +1034,7 @@ def get_order_details(order_id):
             'quantity': item.quantity,
             'subtotal': item.subtotal
         })
-    
+
     return jsonify({
         'id': order.id,
         'shipping_name': order.shipping_name,
@@ -1050,13 +1051,13 @@ def get_order_details(order_id):
 def admin_update_order_status(order_id):
     order = Order.query.get_or_404(order_id)
     data = request.get_json()
-    
+
     if data.get('status') in ['pending', 'processing', 'completed', 'cancelled']:
         order.status = data['status']
         order.updated_at = datetime.utcnow()
         db.session.commit()
         return jsonify({'success': True})
-    
+
     return jsonify({'success': False, 'message': 'Trạng thái không hợp lệ'})
 
 @app.route('/admin/orders/export/<format>')
@@ -1064,31 +1065,40 @@ def admin_update_order_status(order_id):
 @admin_required
 def export_orders(format):
     orders = Order.query.order_by(Order.created_at.desc()).all()
-    
+
     if format == 'excel':
         # Implement Excel export
         pass
     elif format == 'pdf':
         # Implement PDF export
         pass
-    
+
     return redirect(url_for('manage_orders'))
 
 @app.route('/admin/manage_posts')
 @login_required
 @admin_required
 def manage_posts():
-    posts = Post.query.order_by(Post.date_posted.desc()).all()
-    return render_template('admin/manage_posts.html', 
-                         posts=posts,
-                         active_page='posts')
+    status = request.args.get('status', '')
+    search = request.args.get('search', '')
+    page = request.args.get('page', 1, type=int)
+    query = Post.query
+
+    if status:
+        query = query.filter(Post.status == status)
+    if search:
+        query = query.filter(Post.title.ilike(f"%{search}%"))
+
+    posts = query.order_by(Post.date_posted.desc()).paginate(page=page, per_page=10)
+    return render_template('admin/manage_posts.html', posts=posts.items, pagination=posts, status=status, search=search)
+
 
 @app.route('/admin/manage_orders')
 @login_required
 @admin_required
 def manage_orders():
     orders = Order.query.order_by(Order.created_at.desc()).all()
-    return render_template('admin/manage_orders.html', 
+    return render_template('admin/manage_orders.html',
                          orders=orders,
                          active_page='orders')
 
@@ -1097,7 +1107,7 @@ def manage_orders():
 @admin_required
 def manage_users():
     users = User.query.all()
-    return render_template('admin/manage_users.html', 
+    return render_template('admin/manage_users.html',
                          users=users,
                          active_page='users')
 
@@ -1118,7 +1128,7 @@ def delete_user(user_id):
     if current_user.id == user_id:
         flash('Không thể xóa tài khoản của chính mình!', 'danger')
         return redirect(url_for('manage_users'))
-        
+
     user = User.query.get_or_404(user_id)
     db.session.delete(user)
     db.session.commit()
@@ -1134,17 +1144,17 @@ def add_user():
         email = request.form.get('email')
         password = request.form.get('password')
         is_admin = request.form.get('is_admin') == 'on'
-        
+
         # Kiểm tra username đã tồn tại
         if User.query.filter_by(username=username).first():
             flash('Tên người dùng đã tồn tại!', 'danger')
             return redirect(url_for('manage_users'))
-            
+
         # Kiểm tra email đã tồn tại
         if User.query.filter_by(email=email).first():
             flash('Email đã tồn tại!', 'danger')
             return redirect(url_for('manage_users'))
-        
+
         # Tạo user mới
         new_user = User(
             username=username,
@@ -1152,7 +1162,7 @@ def add_user():
             password=generate_password_hash(password),
             is_admin=is_admin
         )
-        
+
         try:
             db.session.add(new_user)
             db.session.commit()
@@ -1161,27 +1171,27 @@ def add_user():
             db.session.rollback()
             flash('Có lỗi xảy ra khi thêm người dùng!', 'danger')
             print(str(e))
-            
+
         return redirect(url_for('manage_users'))
-        
+
     return render_template('admin/add_user.html', active_page='users')
 
 @app.route('/blog')
 @app.route('/blog/page/<int:page>')
 def blog(page=1):
     per_page = 9  # Số bài viết mỗi trang
-    
+
     # Debug: In ra tất cả bài viết trong database
     all_posts = Post.query.all()
     print(f"Tổng số bài viết trong DB: {len(all_posts)}")
     for p in all_posts:
         print(f"ID: {p.id}, Title: {p.title}")
-    
+
     # Lấy các bài viết đã publish và sắp xếp theo thời gian mới nhất
     posts = Post.query\
         .order_by(Post.date_posted.desc())\
         .paginate(page=page, per_page=per_page, error_out=False)
-    
+
     # Debug: In thông tin về các bài viết được lấy
     print(f"Số bài viết hiển thị: {len(posts.items)}")
     for post in posts.items:
@@ -1191,7 +1201,7 @@ def blog(page=1):
         - Tiêu đề: {post.title}
         - Ngày đăng: {post.date_posted}
         """)
-    
+
     return render_template('blog.html',
                          title='Blog',
                          posts=posts.items,
@@ -1213,22 +1223,22 @@ def create_upload_folders():
         base_path = os.path.join(app.root_path, 'static', 'uploads', 'images')
         os.makedirs(base_path, exist_ok=True)
         print(f"Thư mục gốc: {base_path}")
-        
+
         # Tạo các thư mục con
         for folder_name, folder_path in UPLOAD_FOLDERS.items():
             os.makedirs(folder_path, exist_ok=True)
             print(f"Đã tạo thư mục {folder_name}: {folder_path}")
-            
+
             # Kiểm tra quyền ghi
             if os.access(folder_path, os.W_OK):
                 print(f"Thư mục {folder_name} có quyền ghi")
             else:
                 print(f"CẢNH BÁO: Thư mục {folder_name} không có quyền ghi")
-                
+
             # Liệt kê nội dung thư mục
             files = os.listdir(folder_path)
             print(f"Nội dung thư mục {folder_name}: {files}")
-            
+
     except Exception as e:
         print(f"Lỗi khi tạo thư mục: {str(e)}")
 
@@ -1238,7 +1248,7 @@ def save_image(file, subfolder):
             filename = secure_filename(file.filename)
             name, ext = os.path.splitext(filename)
             filename = f"{name}_{int(time.time())}{ext}"
-            
+
             # Đường dẫn thư mục upload
             upload_folder = os.path.join(
                 app.root_path,
@@ -1247,16 +1257,16 @@ def save_image(file, subfolder):
                 'images',
                 subfolder
             )
-            
+
             # Tạo thư mục nếu chưa tồn tại
             os.makedirs(upload_folder, exist_ok=True)
-            
+
             file_path = os.path.join(upload_folder, filename)
             file.save(file_path)
-            
+
             print(f"Đã lưu file tại: {file_path}")
             return filename
-            
+
     except Exception as e:
         print(f"Lỗi khi lưu file: {str(e)}")
         return None
@@ -1266,7 +1276,7 @@ def ensure_upload_folders():
     """Đảm bảo các thư mục upload tồn tại"""
     base_path = os.path.join(app.root_path, 'static', 'uploads', 'images')
     folders = ['products', 'variants', 'posts']
-    
+
     for folder in folders:
         folder_path = os.path.join(base_path, folder)
         if not os.path.exists(folder_path):
@@ -1419,7 +1429,7 @@ def download_image_from_url(url, upload_folder):
         response = requests.get(url, stream=True)
         if response.status_code != 200:
             return None
-            
+
         # Lấy tên file từ URL hoặc tạo tên ngẫu nhiên
         filename = os.path.basename(url)
         if not filename or not allowed_file(filename):
@@ -1429,21 +1439,21 @@ def download_image_from_url(url, upload_folder):
                 filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}.{ext}"
             else:
                 return None
-                
+
         # Đảm bảo tên file an toàn
         filename = secure_filename(filename)
-        
+
         # Tạo đường dẫn đầy đủ và lưu file
         file_path = os.path.join(upload_folder, filename)
         os.makedirs(upload_folder, exist_ok=True)
-        
+
         with open(file_path, 'wb') as f:
             for chunk in response.iter_content(chunk_size=8192):
                 if chunk:
                     f.write(chunk)
-                    
+
         return filename
-        
+
     except Exception as e:
         print(f"Lỗi khi tải ảnh từ URL: {str(e)}")
         return None
@@ -1452,19 +1462,19 @@ def verify_image_path(image_name, subfolder):
     """Kiểm tra và trả về đường dẫn ảnh hợp lệ"""
     if not image_name:
         return None
-        
+
     # Kiểm tra các vị trí có thể có ảnh
     possible_paths = [
         os.path.join(app.root_path, 'static', 'uploads', 'images', subfolder, image_name),
         os.path.join(app.root_path, 'static', 'uploads', 'img', image_name),
         os.path.join(app.root_path, 'static', 'img', image_name)
     ]
-    
+
     for path in possible_paths:
         if os.path.exists(path):
             # Trả về đường dẫn tương đối từ thư mục static
             return os.path.join('uploads', 'images', subfolder, image_name)
-            
+
     return 'img/default-variant.jpg'  # Trả về ảnh mặc định nếu không tìm thấy
 
 
@@ -1490,7 +1500,7 @@ def process_payment():
     # Lưu đơn hàng vào cơ sở dữ liệu
     db.session.add(new_order)
     db.session.commit()
-    
+
     # Gửi tin nhắn đến Telegram
     chat_id = '6580174494'  # Thay thế bằng chat ID của bạn
 
@@ -1575,4 +1585,3 @@ from flask import Response
 def robots_txt():
     content = "User-agent: *\nDisallow:"
     return Response(content, mimetype="text/plain")
-
