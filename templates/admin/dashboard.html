@@ -10,37 +10,37 @@
             <div class="sidebar-sticky pt-3">
                 <ul class="nav flex-column">
                     <li class="nav-item">
-                        <a class="nav-link text-white {% if active_page == 'dashboard' %}active{% endif %}" 
+                        <a class="nav-link text-white {% if active_page == 'dashboard' %}active{% endif %}"
                            href="{{ url_for('admin_dashboard') }}">
                             <i class="fas fa-tachometer-alt"></i> Tổng quan
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-white {% if active_page == 'products' %}active{% endif %}" 
+                        <a class="nav-link text-white {% if active_page == 'products' %}active{% endif %}"
                            href="{{ url_for('manage_products') }}">
                             <i class="fas fa-box"></i> Sản phẩm
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-white {% if active_page == 'categories' %}active{% endif %}" 
-                           href="{{ url_for('manage_categories') }}">
-                            <i class="fas fa-tags"></i> Danh mục
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white {% if active_page == 'orders' %}active{% endif %}" 
-                           href="{{ url_for('manage_orders') }}">
-                            <i class="fas fa-shopping-cart"></i> Đơn hàng
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white {% if active_page == 'posts' %}active{% endif %}" 
+                        <a class="nav-link text-white {% if active_page == 'posts' %}active{% endif %}"
                            href="{{ url_for('manage_posts') }}">
                             <i class="fas fa-newspaper"></i> Bài viết
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-white {% if active_page == 'users' %}active{% endif %}" 
+                        <a class="nav-link text-white {% if active_page == 'categories' %}active{% endif %}"
+                           href="{{ url_for('manage_categories') }}">
+                            <i class="fas fa-tags"></i> Danh mục
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white {% if active_page == 'orders' %}active{% endif %}"
+                           href="{{ url_for('manage_orders') }}">
+                            <i class="fas fa-shopping-cart"></i> Đơn hàng
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white {% if active_page == 'users' %}active{% endif %}"
                            href="{{ url_for('manage_users') }}">
                             <i class="fas fa-users"></i> Người dùng
                         </a>
@@ -51,6 +51,7 @@
 
         <!-- Main content -->
         <main role="main" class="col-md-10 ml-sm-auto px-4 py-4">
+            <!-- Flash Messages -->
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     {% for category, message in messages %}
@@ -67,6 +68,7 @@
             {% if active_page == 'dashboard' %}
             <!-- Dashboard Overview -->
             <div class="row">
+                <!-- Tổng đơn hàng -->
                 <div class="col-md-3 mb-4">
                     <div class="card bg-primary text-white h-100">
                         <div class="card-body">
@@ -81,19 +83,14 @@
                         </div>
                     </div>
                 </div>
+                <!-- Doanh thu -->
                 <div class="col-md-3 mb-4">
                     <div class="card bg-success text-white h-100">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
                                     <h6 class="card-title">Doanh thu</h6>
-                                    <h2 class="mb-0">
-                                        {% if total_revenue is defined %}
-                                            {{ "{:,.0f}".format(total_revenue) }}đ
-                                        {% else %}
-                                            0đ
-                                        {% endif %}
-                                    </h2>
+                                    <h2 class="mb-0">{{ "{:,.0f}".format(total_revenue) }}đ</h2>
                                 </div>
                                 <i class="fas fa-dollar-sign fa-2x"></i>
                             </div>
@@ -101,6 +98,7 @@
                         </div>
                     </div>
                 </div>
+                <!-- Tổng sản phẩm -->
                 <div class="col-md-3 mb-4">
                     <div class="card bg-info text-white h-100">
                         <div class="card-body">
@@ -115,6 +113,7 @@
                         </div>
                     </div>
                 </div>
+                <!-- Người dùng -->
                 <div class="col-md-3 mb-4">
                     <div class="card bg-warning text-white h-100">
                         <div class="card-body">
@@ -130,7 +129,47 @@
                     </div>
                 </div>
             </div>
+             <!-- Recent Posts -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Bài viết gần đây</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Tiêu đề</th>
+                                    <th>Ngày tạo</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if recent_posts %}
+                                    {% for post in recent_posts %}
+                                    <tr>
+                                       <td>
+                                        <a href="{{ url_for('view_post', post_id=post.id) }}" class="btn btn-info btn-sm">
+                                            <i class="fas fa-eye"></i> Xem
+                                        </a>
+                                        <a href="{{ url_for('edit_post', post_id=post.id) }}" class="btn btn-warning btn-sm">
+                                            <i class="fas fa-edit"></i> Sửa
+                                        </a>
+                                        <form action="{{ url_for('delete_post', post_id=post.id) }}" method="POST" style="display:inline;">
+                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                <i class="fas fa-trash"></i> Xóa
+                                            </button>
+                                        </form>
+                                    </td>
 
+                                    </tr>
+                                    {% endfor %}
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
             <!-- Recent Orders -->
             <div class="card mb-4">
                 <div class="card-header">
@@ -149,139 +188,110 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% if recent_orders %}
-                                    {% for order in recent_orders %}
-                                    <tr>
-                                        <td>#{{ order.id }}</td>
-                                        <td>{{ order.shipping_name }}</td>
-                                        <td>{{ "{:,.0f}".format(order.total_price) }}đ</td>
-                                        <td>
-                                            {% if order.status == 'pending' %}
-                                            <span class="badge badge-warning">Chờ xử lý</span>
-                                            {% elif order.status == 'processing' %}
-                                            <span class="badge badge-info">Đang xử lý</span>
-                                            {% elif order.status == 'completed' %}
-                                            <span class="badge badge-success">Hoàn thành</span>
-                                            {% else %}
-                                            <span class="badge badge-danger">Đã hủy</span>
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                            <a href="{{ url_for('manage_orders') }}#{{ order.id }}" 
-                                               class="btn btn-sm btn-info">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                {% endif %}
+                                {% for order in recent_orders %}
+                                <tr>
+                                    <td>#{{ order.id }}</td>
+                                    <td>{{ order.shipping_name }}</td>
+                                    <td>{{ "{:,.0f}".format(order.total_price) }}đ</td>
+                                    <td>
+                                        {% if order.status == 'pending' %}
+                                        <span class="badge badge-warning">Chờ xử lý</span>
+                                        {% elif order.status == 'processing' %}
+                                        <span class="badge badge-info">Đang xử lý</span>
+                                        {% elif order.status == 'completed' %}
+                                        <span class="badge badge-success">Hoàn thành</span>
+                                        {% else %}
+                                        <span class="badge badge-danger">Đã hủy</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('manage_orders') }}#{{ order.id }}"
+                                           class="btn btn-sm btn-info">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-
-            <!-- Statistics Charts -->
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="mb-0">Doanh thu theo tháng</h5>
-                        </div>
-                        <div class="card-body">
-                            {% if revenue_labels and revenue_data %}
-                                <canvas id="revenueChart"></canvas>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="mb-0">Top sản phẩm bán chạy</h5>
-                        </div>
-                        <div class="card-body">
-                            {% if product_labels and product_data %}
-                                <canvas id="productsChart"></canvas>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% else %}
-            <!-- Other admin pages content -->
-            {% block admin_content %}{% endblock %}
             {% endif %}
         </main>
     </div>
 </div>
 {% endblock %}
-
 {% block scripts %}
 {{ super() }}
 {% if active_page == 'dashboard' %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 try {
-    // Parse JSON data
-    const revenueLabels = JSON.parse('{{ revenue_labels | safe }}');
-    const revenueData = JSON.parse('{{ revenue_data | safe }}');
-    const productLabels = JSON.parse('{{ product_labels | safe }}');
-    const productData = JSON.parse('{{ product_data | safe }}');
-    
+    // Parse JSON data from backend
+    const revenueLabels = JSON.parse('{{ revenue_labels | safe }}') || [];
+    const revenueData = JSON.parse('{{ revenue_data | safe }}') || [];
+    const productLabels = JSON.parse('{{ product_labels | safe }}') || [];
+    const productData = JSON.parse('{{ product_data | safe }}') || [];
+
+    // Log the parsed data for debugging
     console.log("Revenue Labels:", revenueLabels);
     console.log("Revenue Data:", revenueData);
     console.log("Product Labels:", productLabels);
     console.log("Product Data:", productData);
-    
-    // Revenue Chart
-    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
-    new Chart(revenueCtx, {
-        type: 'line',
-        data: {
-            labels: revenueLabels,
-            datasets: [{
-                label: 'Doanh thu',
-                data: revenueData,
-                borderColor: 'rgb(75, 192, 192)',
-                tension: 0.1
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
 
-    // Top Products Chart
-    const productsCtx = document.getElementById('productsChart').getContext('2d');
-    new Chart(productsCtx, {
-        type: 'bar',
-        data: {
-            labels: productLabels,
-            datasets: [{
-                label: 'Số lượng bán',
-                data: productData,
-                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                borderColor: 'rgb(54, 162, 235)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true
+    // Utility function to create a chart
+    function createChart(canvasId, type, labels, data, chartLabel, colors) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) {
+            console.warn(`Canvas with id "${canvasId}" not found.`);
+            return;
+        }
+
+        new Chart(canvas.getContext('2d'), {
+            type: type,
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: chartLabel,
+                    data: data,
+                    backgroundColor: colors.background || 'rgba(75, 192, 192, 0.2)',
+                    borderColor: colors.border || 'rgb(75, 192, 192)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
                 }
             }
-        }
-    });
+        });
+    }
+
+    // Check if data exists before creating charts
+    if (revenueLabels.length && revenueData.length) {
+        createChart('revenueChart', 'line', revenueLabels, revenueData, 'Doanh thu', {
+            background: 'rgba(75, 192, 192, 0.2)',
+            border: 'rgb(75, 192, 192)'
+        });
+    } else {
+        console.warn("No data available for revenue chart.");
+    }
+
+    if (productLabels.length && productData.length) {
+        createChart('productsChart', 'bar', productLabels, productData, 'Số lượng bán', {
+            background: 'rgba(54, 162, 235, 0.2)',
+            border: 'rgb(54, 162, 235)'
+        });
+    } else {
+        console.warn("No data available for product chart.");
+    }
+
 } catch (error) {
-    console.error("Error parsing JSON:", error);
+    console.error("Error in chart initialization:", error.message);
 }
 </script>
 {% endif %}
