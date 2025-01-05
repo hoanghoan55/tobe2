@@ -6,11 +6,11 @@
     <h1 class="blog-post-title">{{ post.title }}</h1>
     <div class="blog-post-meta">
       <span class="date">
-        <i class="far fa-calendar-alt"></i> 
+        <i class="far fa-calendar-alt"></i>
         {{ post.date_posted.strftime('%d-%m-%Y') }}
       </span>
       <span class="author">
-        <i class="far fa-user"></i> 
+        <i class="far fa-user"></i>
         {{ post.author.username }}
       </span>
     </div>
@@ -20,8 +20,8 @@
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
         <ins class="adsbygoogle"
              style="display:block"
-             data-ad-client="ca-pub-XXXXXXX" 
-             data-ad-slot="XXXXXXX" 
+             data-ad-client="ca-pub-XXXXXXX"
+             data-ad-slot="XXXXXXX"
              data-ad-format="auto"
              data-full-width-responsive="true"></ins>
         <script>
@@ -29,16 +29,16 @@
         </script>
       </div>
 
-      <div class="toc-wrapper"> 
+      <div class="toc-wrapper">
         <button class="toc-toggle">
           <i class="fas fa-bars"></i> Mục lục
         </button>
-        <div class="toc sticky-toc"> 
+        <div class="toc sticky-toc">
           <h2>Mục lục</h2>
           <ul>
             {% for heading in headings %}
               <li>
-                <a href="#{{ heading.id }}">{{ heading.text | striptags }}</a> 
+                <a href="#{{ heading.id }}">{{ heading.text | striptags }}</a>
               </li>
             {% endfor %}
           </ul>
@@ -47,7 +47,6 @@
 
       <div class="content-wrapper">
         <div class="main-content">
-          <h2>Nội dung chính</h2>
           {{ post.content|safe }}
         </div>
         <div class="sidebar">
@@ -55,8 +54,8 @@
             <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
             <ins class="adsbygoogle"
                  style="display:block"
-                 data-ad-client="ca-pub-XXXXXXX" 
-                 data-ad-slot="XXXXXXX" 
+                 data-ad-client="ca-pub-XXXXXXX"
+                 data-ad-slot="XXXXXXX"
                  data-ad-format="auto"
                  data-full-width-responsive="true"></ins>
             <script>
@@ -68,8 +67,8 @@
             <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
             <ins class="adsbygoogle"
                  style="display:block"
-                 data-ad-client="ca-pub-XXXXXXX" 
-                 data-ad-slot="XXXXXXX" 
+                 data-ad-client="ca-pub-XXXXXXX"
+                 data-ad-slot="XXXXXXX"
                  data-ad-format="auto"
                  data-full-width-responsive="true"></ins>
             <script>
@@ -83,8 +82,8 @@
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
         <ins class="adsbygoogle"
              style="display:block"
-             data-ad-client="ca-pub-XXXXXXX" 
-             data-ad-slot="XXXXXXX" 
+             data-ad-client="ca-pub-XXXXXXX"
+             data-ad-slot="XXXXXXX"
              data-ad-format="auto"
              data-full-width-responsive="true"></ins>
         <script>
@@ -152,34 +151,34 @@
   background-color: #e9ecef; /* Màu nền khi hover */
 }
  .toc-wrapper {
-    position: relative; 
+    position: relative;
   }
 
   .toc-toggle {
     position: sticky;
     top: 20px;
-    left: 20px; 
-    background-color: #f8f9fa; 
-    border: 1px solid #ddd; 
-    border-radius: 5px; 
-    padding: 10px; 
+    left: 20px;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
     cursor: pointer;
   }
 
   .sticky-toc {
     position: sticky;
-    display: none; 
+    display: none;
     position: absolute;
-    top: 50px; 
-    left: 20px; 
-    width: 400px; 
+    top: 50px;
+    left: 20px;
+    width: 400px;
     max-height: 80vh;
     overflow-y: auto;
     background-color: #fff;
     border: 1px solid #ddd;
     border-radius: 5px;
     padding: 20px;
-    z-index: 10; 
+    z-index: 10;
   }
 
         .main-content {
@@ -293,6 +292,6 @@
       stickyToc.style.display = stickyToc.style.display === 'none' ? 'block' : 'none';
      });
       });
-   
+
 </script>
 {% endblock %}
