@@ -10,7 +10,7 @@ def create_app():
     app = Flask(__name__)
     app.secret_key = os.getenv('SECRET_KEY', 'hoan050505')  # Sử dụng biến môi trường cho secret key
     app.config['SQLALCHEMY_DATABASE_URI'] = (
-         f'mysql://root:vbomqdzDrWbhtdgobLNhBFGrLtgpsose@autorack.proxy.rlwy.net:39340/railway'
+         f'mysql://root:NWyufyAuaKEZEdvkkgtSADhHSVpVZYkI@junction.proxy.rlwy.net:22260/railway'
     )
 
 
