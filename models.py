@@ -23,7 +23,7 @@ class User(UserMixin, db.Model):
     date_joined = db.Column(db.DateTime, default=datetime.utcnow)
     orders = db.relationship('Order', backref='customer', lazy=True)
     posts = db.relationship('Post', backref='author', lazy=True)
-
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
     def __repr__(self):
         return f"User('{self.username}', '{self.email}')"
 
@@ -43,7 +43,7 @@ class Product(db.Model):
     video_files = db.Column(db.JSON)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False)
     variants = db.relationship('Variant', backref='parent_product', lazy=True)
-
+    stock = db.Column(db.Integer, default=0)
     def __repr__(self):
         return f'<Product {self.name}>'
 
@@ -102,27 +102,27 @@ class Post(db.Model):
     slug = db.Column(db.String(200), unique=True)  # URL thân thiện
     date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     date_updated = db.Column(db.DateTime, onupdate=datetime.utcnow)  # Thời gian cập nhật
-    
+
     # Foreign keys
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    
+
     # Media files
     image_file = db.Column(db.String(255), nullable=True)  # Tăng độ dài để lưu path dài
     video_file = db.Column(db.String(255), nullable=True)
-    
+
     # SEO fields
     meta_title = db.Column(db.String(200))
     meta_description = db.Column(db.String(300))
-    
+
     # Status
     status = db.Column(db.String(20), default='draft')  # draft, published, archived
-    
+
     views = db.Column(db.Integer, default=0)
-    
+
     # Thêm relationship với PostImage
-    images = db.relationship('PostImage', backref='post', lazy=True, 
+    images = db.relationship('PostImage', backref='post', lazy=True,
                            cascade='all, delete-orphan')
-    
+
     def __init__(self, *args, **kwargs):
         super(Post, self).__init__(*args, **kwargs)
         if not self.slug and self.title:
@@ -133,12 +133,12 @@ class Post(db.Model):
         base_slug = slugify(self.title)
         slug = base_slug
         count = 1
-        
+
         # Kiểm tra slug đã tồn tại chưa
         while Post.query.filter_by(slug=slug).first() is not None:
             slug = f'{base_slug}-{count}'
             count += 1
-            
+
         return slug
 
     def __repr__(self):
@@ -173,12 +173,12 @@ class Post(db.Model):
 
 class PostImage(db.Model):
     __tablename__ = 'post_images'
-    
+
     id = db.Column(db.Integer, primary_key=True)
     filename = db.Column(db.String(255), nullable=False)
     post_id = db.Column(db.Integer, db.ForeignKey('post.id', ondelete='CASCADE'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_featured = db.Column(db.Boolean, default=False)
-    
+
     def __repr__(self):
         return f'<PostImage {self.filename}>'
